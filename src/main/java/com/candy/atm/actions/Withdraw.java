@@ -1,4 +1,4 @@
-package com.candy.actions;
+package com.candy.atm.actions;
 
 import Interface.UserActions;
 

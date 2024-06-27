@@ -1,4 +1,4 @@
-package com.candy.data;
+package com.candy.atm.data;
 
 import Interface.DataRepository;
 
