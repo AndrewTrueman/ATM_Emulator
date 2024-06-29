@@ -1,1 +1,2 @@
-3 1000000
+maxAttempts=3
+maxDepositAmount=1000000
