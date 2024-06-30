@@ -9,7 +9,7 @@ import java.util.Map;
 public class Authorization {
     private final DataRepository dataRepository;
     private final int maxAttempts;
-    private Map<String, Integer> attemptCounts = new HashMap<>();
+    private final Map<String, Integer> attemptCounts = new HashMap<>();
 
     public Authorization(DataRepository dataRepository) {
         this.dataRepository = dataRepository;

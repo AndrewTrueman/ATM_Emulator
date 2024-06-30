@@ -101,7 +101,7 @@ public class AtmMain {
                                     atmUI.displayInvalidChoice();
                                     break;
                             }
-                        } while (!exit && authorized);
+                        } while (!exit);
 
                     } else {
                         attempts++;
