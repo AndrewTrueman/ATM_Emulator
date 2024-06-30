@@ -17,13 +17,18 @@ public class Authorization {
     }
 
     public boolean authorize(String cardNumber, int pinCode) {
+        CardDto card = dataRepository.getCardByNumber(cardNumber);
+        if (card == null) {
+            System.out.println("Карта не найдена.");
+            return false;
+        }
+
         if (dataRepository.isCardBlocked(cardNumber)) {
             System.out.println("Карта заблокирована.");
             return false;
         }
 
-        CardDto card = dataRepository.getCardByNumber(cardNumber);
-        if (card != null && card.getPinCode() == pinCode) {
+        if (card.getPinCode() == pinCode) {
             attemptCounts.remove(cardNumber);
             return true;
         } else {
