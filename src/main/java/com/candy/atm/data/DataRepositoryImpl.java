@@ -12,8 +12,8 @@ public class DataRepositoryImpl implements DataRepository {
     private static final String BLOCKED_CARDS_FILE = "src/main/resources/BlockedCards.txt";
     private static final String PROPERTY_FILE = "src/main/resources/Property.txt";
 
-    private Map<String, CardDto> cards = new HashMap<>();
-    private Map<String, LocalDateTime> blockedCards = new HashMap<>();
+    private final Map<String, CardDto> cards = new HashMap<>();
+    private final Map<String, LocalDateTime> blockedCards = new HashMap<>();
     private int maxAttempts;
     private double maxDepositAmount;
 
@@ -42,7 +42,7 @@ public class DataRepositoryImpl implements DataRepository {
                 }
             }
         } catch (IOException e) {
-            e.printStackTrace();
+            System.out.println("Ошибка во время чтения Property.");
             // Устанавливаем значения по умолчанию в случае ошибки чтения файла
             maxAttempts = 3;
             maxDepositAmount = 1000000;
@@ -62,7 +62,7 @@ public class DataRepositoryImpl implements DataRepository {
                 }
             }
         } catch (IOException e) {
-            e.printStackTrace();
+            System.out.println("Ошибка во время чтения UserData файла.");
         }
     }
 
@@ -78,7 +78,7 @@ public class DataRepositoryImpl implements DataRepository {
                 }
             }
         } catch (IOException e) {
-            e.printStackTrace();
+            System.out.println("Ошибка во время чтения BlockedCards файла.");
         }
     }
 
@@ -89,7 +89,7 @@ public class DataRepositoryImpl implements DataRepository {
                 writer.newLine();
             }
         } catch (IOException e) {
-            e.printStackTrace();
+            System.out.println("Ошибка во время записи в файл UserData");
         }
     }
 
@@ -100,7 +100,7 @@ public class DataRepositoryImpl implements DataRepository {
                 writer.newLine();
             }
         } catch (IOException e) {
-            e.printStackTrace();
+            System.out.println("Ошибка во время записи в файл BlockedCards.");
         }
     }
 
