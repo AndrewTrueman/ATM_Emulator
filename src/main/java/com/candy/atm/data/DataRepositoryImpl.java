@@ -15,8 +15,8 @@ public class DataRepositoryImpl implements DataRepository {
 
     private final Map<String, CardDto> cards = new HashMap<>();
     private final Map<String, LocalDateTime> blockedCards = new HashMap<>();
-    private int maxAttempts;
-    private double maxDepositAmount;
+
+    private final Map<String, String> properties = new HashMap<>();
 
     public DataRepositoryImpl() {
         loadProperties();
@@ -24,64 +24,61 @@ public class DataRepositoryImpl implements DataRepository {
         loadBlockedCardsData();
     }
 
-    private void loadProperties() {
-        try (BufferedReader reader = Files.newBufferedReader(Paths.get(PROPERTY_FILE))) {
+    private void loadFileData(String filePath, Consumer<String> lineProcessor) {
+        try (BufferedReader reader = Files.newBufferedReader(Paths.get(filePath))) {
             String line;
             while ((line = reader.readLine()) != null) {
-                String[] parts = line.split("=");
-                if (parts.length == 2) {
-                    String key = parts[0].trim();
-                    String value = parts[1].trim();
-                    switch (key) {
-                        case "maxAttempts":
-                            maxAttempts = Integer.parseInt(value);
-                            break;
-                        case "maxDepositAmount":
-                            maxDepositAmount = Double.parseDouble(value);
-                            break;
-                    }
-                }
+                lineProcessor.accept(line);
             }
         } catch (IOException e) {
-            System.out.println("Ошибка во время чтения Property.");
-            // Устанавливаем значения по умолчанию в случае ошибки чтения файла
-            maxAttempts = 3;
-            maxDepositAmount = 1000000;
+            System.out.println("Ошибка во время чтения файла " + filePath);
         }
+    }
+
+    private void loadProperties() {
+        loadFileData(PROPERTY_FILE, line -> {
+            String[] parts = line.split("=");
+            if (parts.length == 2) {
+                properties.put(parts[0].trim(), parts[1].trim());
+            }
+        });
+
     }
 
     private void loadUserData() {
-        try (BufferedReader reader = Files.newBufferedReader(Paths.get(USER_DATA_FILE))) {
-            String line;
-            while ((line = reader.readLine()) != null) {
-                String[] parts = line.split(" ");
-                if (parts.length == 3) {
-                    String cardNumber = parts[0];
-                    int pinCode = Integer.parseInt(parts[1]);
-                    double balance = Double.parseDouble(parts[2]);
-                    cards.put(cardNumber, new CardDto(cardNumber, pinCode, balance));
-                }
+        loadFileData(USER_DATA_FILE, line -> {
+            String[] parts = line.split(" ");
+            if (parts.length == 3) {
+                String cardNumber = parts[0];
+                int pinCode = Integer.parseInt(parts[1]);
+                double balance = Double.parseDouble(parts[2]);
+                cards.put(cardNumber, new CardDto(cardNumber, pinCode, balance));
             }
-        } catch (IOException e) {
-            System.out.println("Ошибка во время чтения UserData файла.");
-        }
+        });
     }
 
     private void loadBlockedCardsData() {
-        try (BufferedReader reader = Files.newBufferedReader(Paths.get(BLOCKED_CARDS_FILE))) {
-            String line;
-            while ((line = reader.readLine()) != null) {
-                String[] parts = line.split(" ");
-                if (parts.length == 2) {
-                    String cardNumber = parts[0];
-                    LocalDateTime unblockTime = LocalDateTime.parse(parts[1]);
-                    blockedCards.put(cardNumber, unblockTime);
-                }
+        loadFileData(BLOCKED_CARDS_FILE, line -> {
+            String[] parts = line.split(" ");
+            if (parts.length == 2) {
+                String cardNumber = parts[0];
+                LocalDateTime unblockTime = LocalDateTime.parse(parts[1]);
+                blockedCards.put(cardNumber, unblockTime);
+            }
+        });
+    }
+
+    private void saveFileData(String filePath, List<String> lines) {
+        try (BufferedWriter writer = Files.newBufferedWriter(Paths.get(filePath))) {
+            for (String line : lines) {
+                writer.write(line);
+                writer.newLine();
             }
         } catch (IOException e) {
-            System.out.println("Ошибка во время чтения BlockedCards файла.");
+            System.out.println("Ошибка во время записи в файл " + filePath);
         }
     }
+
 
     private void saveUserData() {
         List<String> lines = new ArrayList<>();
@@ -136,31 +133,17 @@ public class DataRepositoryImpl implements DataRepository {
         saveBlockedCardsData();
     }
 
+    @Override
     public int getMaxAttempts() {
-        return maxAttempts;
+        // Устанавливаем значения по умолчанию в случае ошибки чтения файла
+        String property = properties.putIfAbsent("maxAttempts", "3");
+        return Integer.parseInt(property);
     }
 
+    @Override
     public double getMaxDepositAmount() {
-        return maxDepositAmount;
+        String property = properties.putIfAbsent("maxDepositAmount","1000000");
+        return Double.parseDouble(property);
     }
-    private void loadFileData(String filePath, Consumer<String> lineProcessor) {
-        try (BufferedReader reader = Files.newBufferedReader(Paths.get(filePath))) {
-            String line;
-            while ((line = reader.readLine()) != null) {
-                lineProcessor.accept(line);
-            }
-        } catch (IOException e) {
-            System.out.println("Ошибка во время чтения файла " + filePath);
-        }
-    }
-    private void saveFileData(String filePath, List<String> lines) {
-        try (BufferedWriter writer = Files.newBufferedWriter(Paths.get(filePath))) {
-            for (String line : lines) {
-                writer.write(line);
-                writer.newLine();
-            }
-        } catch (IOException e) {
-            System.out.println("Ошибка во время записи в файл " + filePath);
-        }
-    }
+
 }

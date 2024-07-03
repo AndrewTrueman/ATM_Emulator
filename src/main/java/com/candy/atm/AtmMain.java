@@ -72,7 +72,7 @@ public class AtmMain {
 
     }
     private int getChoice() {
-        System.out.print("Введедите номер операции которую хотите выполнить");
+        System.out.print("Введедите номер операции которую хотите выполнить: ");
         try {
             return Integer.parseInt(scanner.nextLine());
         } catch (Exception e) {

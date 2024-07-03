@@ -1,7 +1,6 @@
 package com.candy.atm.actions;
 
 import com.candy.atm.data.DataRepository;
-import com.candy.atm.dto.CardDto;
 import com.candy.atm.dto.SessionData;
 
 import java.util.Scanner;
@@ -32,7 +31,7 @@ public class Deposit implements Action {
 
     private double getDepositAmount() {
         try {
-            System.out.print("Введите сумму депозита");
+            System.out.print("Введите сумму депозита: ");
             double depositAmount = Double.parseDouble(scanner.nextLine());
 
             if (depositAmount <= 0 || depositAmount > maxDepositAmount) {

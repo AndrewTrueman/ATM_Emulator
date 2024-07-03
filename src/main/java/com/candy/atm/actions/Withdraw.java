@@ -35,11 +35,8 @@ public class Withdraw implements Action {
     }
 
     private double getWithdrawAmount() {
-
-        //System.out.println("Введите сумму для снятия средств:");
-        //return validate(data,Double.parseDouble(scanner.nextLine()));
         try {
-            System.out.print("Введите сумму для снятия средств:");
+            System.out.print("Введите сумму для снятия средств: ");
             return Double.parseDouble(scanner.nextLine());
         } catch (IllegalArgumentException e) {
             throw e;
