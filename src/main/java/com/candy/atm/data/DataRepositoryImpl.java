@@ -6,6 +6,7 @@ import java.io.*;
 import java.nio.file.*;
 import java.time.LocalDateTime;
 import java.util.*;
+import java.util.function.Consumer;
 
 public class DataRepositoryImpl implements DataRepository {
     private static final String USER_DATA_FILE = "src/main/resources/UserData.txt";
@@ -83,25 +84,19 @@ public class DataRepositoryImpl implements DataRepository {
     }
 
     private void saveUserData() {
-        try (BufferedWriter writer = Files.newBufferedWriter(Paths.get(USER_DATA_FILE))) {
-            for (CardDto card : cards.values()) {
-                writer.write(card.getCardNumber() + " " + card.getPinCode() + " " + card.getBalance());
-                writer.newLine();
-            }
-        } catch (IOException e) {
-            System.out.println("Ошибка во время записи в файл UserData");
+        List<String> lines = new ArrayList<>();
+        for (CardDto card : cards.values()) {
+            lines.add(card.getCardNumber() + " " + card.getPinCode() + " " + card.getBalance());
         }
+        saveFileData(USER_DATA_FILE, lines);
     }
 
     private void saveBlockedCardsData() {
-        try (BufferedWriter writer = Files.newBufferedWriter(Paths.get(BLOCKED_CARDS_FILE))) {
-            for (Map.Entry<String, LocalDateTime> entry : blockedCards.entrySet()) {
-                writer.write(entry.getKey() + " " + entry.getValue().toString());
-                writer.newLine();
-            }
-        } catch (IOException e) {
-            System.out.println("Ошибка во время записи в файл BlockedCards.");
+        List<String> lines = new ArrayList<>();
+        for (Map.Entry<String, LocalDateTime> entry : blockedCards.entrySet()) {
+            lines.add(entry.getKey() + " " + entry.getValue().toString());
         }
+        saveFileData(BLOCKED_CARDS_FILE, lines);
     }
 
     @Override
@@ -147,5 +142,25 @@ public class DataRepositoryImpl implements DataRepository {
 
     public double getMaxDepositAmount() {
         return maxDepositAmount;
+    }
+    private void loadFileData(String filePath, Consumer<String> lineProcessor) {
+        try (BufferedReader reader = Files.newBufferedReader(Paths.get(filePath))) {
+            String line;
+            while ((line = reader.readLine()) != null) {
+                lineProcessor.accept(line);
+            }
+        } catch (IOException e) {
+            System.out.println("Ошибка во время чтения файла " + filePath);
+        }
+    }
+    private void saveFileData(String filePath, List<String> lines) {
+        try (BufferedWriter writer = Files.newBufferedWriter(Paths.get(filePath))) {
+            for (String line : lines) {
+                writer.write(line);
+                writer.newLine();
+            }
+        } catch (IOException e) {
+            System.out.println("Ошибка во время записи в файл " + filePath);
+        }
     }
 }

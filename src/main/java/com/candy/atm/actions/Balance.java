@@ -2,21 +2,18 @@ package com.candy.atm.actions;
 
 import com.candy.atm.data.DataRepository;
 import com.candy.atm.dto.CardDto;
+import com.candy.atm.dto.SessionData;
 
-public class Balance {
-    private final DataRepository dataRepository;
+public class Balance implements Action {
 
-    public Balance(DataRepository dataRepository) {
-        this.dataRepository = dataRepository;
+    @Override
+    public void execute(SessionData data) {
+        System.out.println("Ваш баланс: " + data.getCardDto().getBalance());
     }
 
-    public double checkBalance(String cardNumber) {
-        CardDto card = dataRepository.getCardByNumber(cardNumber);
-        if (card != null) {
-            return card.getBalance();
-        } else {
-            System.out.println("Карта не найдена.");
-            return -1;
-        }
+    @Override
+    public String getName() {
+
+        return "Вывести текущий баланс.";
     }
 }

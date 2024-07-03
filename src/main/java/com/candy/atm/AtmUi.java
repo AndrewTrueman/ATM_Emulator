@@ -1,6 +1,7 @@
 package com.candy.atm;
 
 public interface AtmUi {
+    //удалить!!! 0_0
     void displayWelcomeMessage();
     void displayCardNumberPrompt();
     void displayPinPrompt();

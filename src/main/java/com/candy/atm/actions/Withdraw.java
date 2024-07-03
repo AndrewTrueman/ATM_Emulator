@@ -1,40 +1,69 @@
 package com.candy.atm.actions;
 
 import com.candy.atm.data.DataRepository;
-import com.candy.atm.dto.CardDto;
+import com.candy.atm.dto.SessionData;
 
-public class Withdraw {
+import java.util.Scanner;
+
+public class Withdraw implements Action {
     private final DataRepository dataRepository;
     private final double atmLimit;
+    private final Scanner scanner;
+
 
     public Withdraw(DataRepository dataRepository, double atmLimit) {
         this.dataRepository = dataRepository;
         this.atmLimit = atmLimit;
+        this.scanner = new Scanner(System.in);
+
     }
 
-    public boolean withdraw(String cardNumber, double amount) {
-        if (amount <= 0) {
-            System.out.println("Сумма снятия должна быть положительной.");
-            return false;
+    @Override
+    public void execute(SessionData data) {
+        double withdrawAmount = getWithdrawAmount();
+        validate(data, withdrawAmount);
+        double newBalance = data.getCardDto().getBalance() - withdrawAmount;
+        data.getCardDto().setBalance(newBalance);
+        dataRepository.updateCard(data.getCardDto());
+        System.out.println("Cредства успешно сняты.");
+
+    }
+
+    @Override
+    public String getName() {
+        return "Снять средства с карты.";
+    }
+
+    private double getWithdrawAmount() {
+
+        //System.out.println("Введите сумму для снятия средств:");
+        //return validate(data,Double.parseDouble(scanner.nextLine()));
+        try {
+            System.out.print("Введите сумму для снятия средств:");
+            return Double.parseDouble(scanner.nextLine());
+        } catch (IllegalArgumentException e) {
+            throw e;
+
+        } catch (Exception e) {
+            throw new RuntimeException("Не удалось прочитать сумму");
         }
 
-        CardDto card = dataRepository.getCardByNumber(cardNumber);
-        if (card != null) {
-            if (card.getBalance() < amount) {
-                System.out.println("Недостаточно средств на счете.");
-                return false;
-            } else if (amount > atmLimit) {
-                System.out.println("Превышен лимит снятия средств в банкомате.");
-                return false;
-            } else {
-                card.setBalance(card.getBalance() - amount);
-                dataRepository.updateCard(card);
-                System.out.println("Средства успешно сняты. Текущий баланс: " + card.getBalance());
-                return true;
-            }
-        } else {
-            System.out.println("Карта не найдена.");
-            return false;
-        }
     }
+
+    private void validate(SessionData data, double withdrawAmount) {
+
+        if (withdrawAmount <= 0) {
+            throw new IllegalArgumentException("Сумма не должна быть меньше 0.");
+        }
+        if (withdrawAmount > atmLimit) {
+            throw new IllegalArgumentException(String.format("Сумма не должна быть больше %s .", atmLimit));
+        }
+        if (withdrawAmount > data.getCardDto().getBalance()) {
+            throw new IllegalArgumentException("Не достаточно средств для снятия.");
+        }
+
+
+    }
+
 }
+

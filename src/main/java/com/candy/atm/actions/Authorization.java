@@ -1,45 +1,59 @@
 package com.candy.atm.actions;
 
 import com.candy.atm.data.DataRepository;
-import com.candy.atm.dto.CardDto;
+import com.candy.atm.dto.SessionData;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.util.Scanner;
 
-public class Authorization {
+public class Authorization implements Action {
     private final DataRepository dataRepository;
     private final int maxAttempts;
-    private final Map<String, Integer> attemptCounts = new HashMap<>();
+    private final Scanner scanner;
+
 
     public Authorization(DataRepository dataRepository) {
         this.dataRepository = dataRepository;
         this.maxAttempts = dataRepository.getMaxAttempts();
+        this.scanner = new Scanner(System.in);
     }
 
-    public boolean authorize(String cardNumber, int pinCode) {
-        CardDto card = dataRepository.getCardByNumber(cardNumber);
-        if (card == null) {
-            System.out.println("Карта не найдена.");
-            return false;
-        }
+    @Override
+    public void execute(SessionData data) {
+        if (dataRepository.isCardBlocked(data.getCardNumber())) {
+            throw new IllegalArgumentException("Карта заблокирована.");
 
-        if (dataRepository.isCardBlocked(cardNumber)) {
-            System.out.println("Карта заблокирована.");
-            return false;
         }
-
-        if (card.getPinCode() == pinCode) {
-            attemptCounts.remove(cardNumber);
-            return true;
-        } else {
-            attemptCounts.put(cardNumber, attemptCounts.getOrDefault(cardNumber, 0) + 1);
-            if (attemptCounts.get(cardNumber) >= maxAttempts) {
-                dataRepository.blockCard(cardNumber);
-                System.out.println("Карта заблокирована из-за превышения количества попыток ввода ПИН-кода.");
-            } else {
-                System.out.println("Неверный номер карты или ПИН-код.");
+        int attempt = 0;
+        do {
+            int pin = getPin();
+            if (pin == data.getCardDto().getPinCode()) {
+                data.setAuthorized(true);
+                return;
             }
-            return false;
+            if (pin != data.getCardDto().getPinCode()){
+                System.out.println("Вы ввели неверный пин-код, попробуйте еще раз!");
+            }
+            attempt++;
+        } while (attempt < maxAttempts && !data.isAuthorized());
+
+        if (!data.isAuthorized()) {
+            dataRepository.blockCard(data.getCardDto().getCardNumber());
+            throw new IllegalArgumentException("Карта заблокирована из-за превышения количества попыток ввода ПИН-кода.");
+        }
+    }
+
+    @Override
+    public String getName() {
+        return "Авторизация";
+    }
+
+    private int getPin() {
+        System.out.print("ВВедите Пин-код: ");
+        try {
+            return scanner.nextInt();
+        } catch (Exception e) {
+            throw new IllegalArgumentException("Только цифры!");
+
         }
     }
 }

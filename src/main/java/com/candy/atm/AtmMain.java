@@ -1,123 +1,97 @@
 package com.candy.atm;
 
-import com.candy.atm.actions.Authorization;
-import com.candy.atm.actions.Balance;
-import com.candy.atm.actions.Deposit;
-import com.candy.atm.actions.Withdraw;
+import com.candy.atm.actions.*;
 import com.candy.atm.data.DataRepositoryImpl;
 import com.candy.atm.dto.CardDto;
+import com.candy.atm.dto.SessionData;
 
 
+import java.util.List;
 import java.util.Scanner;
 
 public class AtmMain {
-    public static void main(String[] args) {
-        DataRepositoryImpl dataRepository = new DataRepositoryImpl();
-        Authorization authorization = new Authorization(dataRepository);
-        Balance balance = new Balance(dataRepository);
-        Deposit deposit = new Deposit(dataRepository);
-        Withdraw withdraw = new Withdraw(dataRepository, 10000); // Лимит средств на снятие
-        AtmUi atmUI = new AtmConsoleUi();
+    private final DataRepositoryImpl dataRepository;
 
-        Scanner scanner = new Scanner(System.in);
-        boolean exit = false;
+    private final AtmUi atmUI;
 
-        while (!exit) {
-            atmUI.displayWelcomeMessage();
-            atmUI.displayCardNumberPrompt();
-            String cardNumber = scanner.nextLine();
+    private final List<Action> actions;
 
-            if (cardNumber.equalsIgnoreCase("exit")) {
-                atmUI.displayExitMessage();
-                break;
-            }
+    private final Action authorization;
+    private final Scanner scanner;
 
-            CardDto card = dataRepository.getCardByNumber(cardNumber);
-            if (card == null) {
-                atmUI.displayCardNotFound();
-                continue;
-            }
+    public AtmMain() {
+        dataRepository = new DataRepositoryImpl();
+        authorization = new Authorization(dataRepository);
+        atmUI = new AtmConsoleUi();
+        actions = List.of(new Balance(), new Deposit(dataRepository), new Withdraw(dataRepository, 10000));
+        scanner = new Scanner(System.in);
+    }
 
-            int attempts = 0;
-            boolean authorized = false;
-            while (attempts < dataRepository.getMaxAttempts() && !authorized) {
-                atmUI.displayPinPrompt();
-                try {
-                    int pinCode = Integer.parseInt(scanner.nextLine());
-
-                    if (authorization.authorize(cardNumber, pinCode)) {
-                        authorized = true;
-                        atmUI.displayAuthorizationSuccess();
-
-                        do {
-                            atmUI.displayMenu();
-                            int choice;
-                            try {
-                                choice = Integer.parseInt(scanner.nextLine());
-                            } catch (NumberFormatException e) {
-                                atmUI.displayInvalidChoice();
-                                continue;
-                            }
-
-                            switch (choice) {
-                                case 0:
-                                    atmUI.displayExitMessage();
-                                    exit = true;
-                                    break;
-                                case 1:
-                                    atmUI.displayBalance(balance.checkBalance(cardNumber));
-                                    break;
-                                case 2:
-                                    atmUI.displayDepositPrompt();
-                                    double depositAmount;
-                                    try {
-                                        depositAmount = Double.parseDouble(scanner.nextLine());
-                                    } catch (NumberFormatException e) {
-                                        atmUI.displayInvalidAmount();
-                                        continue;
-                                    }
-                                    if (deposit.deposit(cardNumber, depositAmount)) {
-                                        atmUI.displayDepositSuccess(depositAmount, balance.checkBalance(cardNumber));
-                                    } else {
-                                        atmUI.displayDepositLimitExceeded();
-                                    }
-                                    break;
-                                case 3:
-                                    atmUI.displayWithdrawPrompt();
-                                    double withdrawAmount;
-                                    try {
-                                        withdrawAmount = Double.parseDouble(scanner.nextLine());
-                                    } catch (NumberFormatException e) {
-                                        atmUI.displayInvalidAmount();
-                                        continue;
-                                    }
-                                    if (withdraw.withdraw(cardNumber, withdrawAmount)) {
-                                        atmUI.displayWithdrawSuccess(withdrawAmount, balance.checkBalance(cardNumber));
-                                    } else {
-                                        atmUI.displayInsufficientFunds();
-                                    }
-                                    break;
-                                default:
-                                    atmUI.displayInvalidChoice();
-                                    break;
-                            }
-                        } while (!exit);
-
-                    } else {
-                        attempts++;
-                        if (attempts >= dataRepository.getMaxAttempts()) {
-                            atmUI.displayCardBlocked();
-                            dataRepository.blockCard(cardNumber);
-                        } else {
-                            atmUI.displayAuthorizationFailure(dataRepository.getMaxAttempts() - attempts);
-                        }
-                    }
-                } catch (NumberFormatException e) {
-                    atmUI.displayInvalidPin();
+    public void start() {
+        do {
+           //getExit();
+            try {
+                run();
+                System.out.println("Продолжить? (Y/N)");
+                scanner.nextLine();
+                if ("Y".equalsIgnoreCase(scanner.nextLine())) {
+                    //getExit();
                 }
+            } catch (Exception e) {
+                System.out.println(e.getMessage());
+                e.printStackTrace();
             }
-        }
+        } while (true);
+    }
 
-        scanner.close();
+    private void run() {
+        atmUI.displayWelcomeMessage();
+        SessionData data = new SessionData();
+        dataRepository.getCardByNumber(getCard());
+        CardDto card;
+        do {
+            String cardNumber = getCard();
+            card = dataRepository.getCardByNumber(cardNumber);
+            if (card == null || card != dataRepository.getCardByNumber(cardNumber)) {
+                atmUI.displayCardNotFound();
+            }
+        } while (card == null);
+        data.setCardDto(card); //setCardDto(getCard)
+        authorization.execute(data);
+        do {
+            printMenu(data);
+        } while (true);
+    }
+    private void printMenu(SessionData data){
+        final int[] numOfOperation = {0};
+        actions.forEach(action -> {
+            System.out.println(numOfOperation[0] + ". " + action.getName());
+            numOfOperation[0]++;
+        });
+        actions.get(getChoice()).execute(data);
+
+    }
+    private int getChoice() {
+        System.out.print("Введедите номер операции которую хотите выполнить");
+        try {
+            return Integer.parseInt(scanner.nextLine());
+        } catch (Exception e) {
+            throw new IllegalArgumentException("Только цифры!");
+
+        }
+    }
+    private String getCard() {
+        System.out.print("ВВедите номер карты: ");
+        try {
+            return scanner.nextLine();
+        } catch (Exception e) {
+            throw new IllegalArgumentException("Ошибка при вводе карты");
+        }
+    }
+    private void getExit(){
+        String des = scanner.nextLine();
+        if (des.equalsIgnoreCase("y"));
+        System.exit(0);
     }
 }
+
