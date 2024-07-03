@@ -1,6 +1,7 @@
 package com.candy.atm.actions;
 
 import com.candy.atm.data.DataRepository;
+import com.candy.atm.dto.CardDto;
 import com.candy.atm.dto.SessionData;
 
 import java.util.Scanner;
@@ -18,26 +19,26 @@ public class Authorization implements Action {
     }
 
     @Override
-    public void execute(SessionData data) {
-        if (dataRepository.isCardBlocked(data.getCardNumber())) {
-            throw new IllegalArgumentException("Карта заблокирована.");
+    public void execute(SessionData session) {
 
+        if (dataRepository.isCardBlocked(session.getCardNumber())) {
+            throw new IllegalArgumentException("Карта заблокирована.");
         }
+        CardDto card = dataRepository.getCardByNumber(session.getCardNumber());
         int attempt = 0;
         do {
-            int pin = getPin();
-            if (pin == data.getCardDto().getPinCode()) {
-                data.setAuthorized(true);
+            if (getPin() == card.getPinCode()) {
+                session.setAuthorized(true);
+                session.setCardDto(card);
                 return;
             }
-            if (pin != data.getCardDto().getPinCode()){
-                System.out.println("Вы ввели неверный пин-код, попробуйте еще раз!");
-            }
+            System.out.println("Вы ввели неверный пин-код, попробуйте еще раз!");
             attempt++;
-        } while (attempt < maxAttempts && !data.isAuthorized());
 
-        if (!data.isAuthorized()) {
-            dataRepository.blockCard(data.getCardDto().getCardNumber());
+        } while (attempt < maxAttempts && !session.isAuthorized());
+
+        if (!session.isAuthorized()) {
+            dataRepository.blockCard(card.getCardNumber());
             throw new IllegalArgumentException("Карта заблокирована из-за превышения количества попыток ввода ПИН-кода.");
         }
     }
