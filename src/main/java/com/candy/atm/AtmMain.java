@@ -14,7 +14,6 @@ public class AtmMain {
     private final Action authorization;
     private final Scanner scanner;
 
-
     public AtmMain() {
         dataRepository = new DataRepositoryImpl();
         authorization = new Authorization(dataRepository);
@@ -25,11 +24,7 @@ public class AtmMain {
     public void start() {
 
         do {
-            try {
-                run();
-            } catch (Exception e) {
-                System.out.println("Ошибка! Попробуйте еще раз!");
-            }
+          executeWithErrorHandling();
         } while ("Y".equalsIgnoreCase(getExit()));
     }
 
@@ -72,6 +67,15 @@ public class AtmMain {
     private String getExit() {
         System.out.println("Продолжить? (Y/N)");
         return scanner.nextLine();
+    }
+
+    private void executeWithErrorHandling(){
+        try {
+            run();
+        } catch (Exception e) {
+            //e.printStackTrace();
+            System.out.println("Ошибка! Попробуйте еще раз!");
+        }
     }
 }
 
