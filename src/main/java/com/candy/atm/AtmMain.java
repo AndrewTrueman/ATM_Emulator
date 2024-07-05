@@ -18,7 +18,7 @@ public class AtmMain {
     public AtmMain() {
         dataRepository = new DataRepositoryImpl();
         authorization = new Authorization(dataRepository);
-        actions = List.of(new Balance(), new Deposit(dataRepository), new Withdraw(dataRepository, 10000));
+        actions = List.of(new Balance(), new Deposit(dataRepository), new Withdraw(dataRepository, dataRepository.getAtmLimit()));
         scanner = new Scanner(System.in);
     }
 

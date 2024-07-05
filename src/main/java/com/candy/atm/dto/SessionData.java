@@ -5,7 +5,7 @@ import lombok.*;
 @Data
 public class SessionData {
 
-    String cardNumber;
-    CardDto cardDto;
-    boolean authorized;
+    private String cardNumber;
+    private CardDto cardDto;
+    private boolean authorized;
 }

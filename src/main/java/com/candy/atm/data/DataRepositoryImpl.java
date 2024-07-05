@@ -14,7 +14,8 @@ public class DataRepositoryImpl implements DataRepository {
     private static final String PROPERTY_FILE = "src/main/resources/Property.txt";
     private static final String PROPERTY_MAX_ATTEMPTS = "max-attempts";
     private static final String PROPERTY_MAX_DEPOSIT_AMOUNT = "max-deposit-amount";
-    private static final String PROPERY_ATM_LIMIT = "atm-limit";
+    private static final String PROPERTY_ATM_LIMIT = "atm-limit";
+
 
 
     private final Map<String, CardDto> cards = new HashMap<>();
@@ -80,6 +81,11 @@ public class DataRepositoryImpl implements DataRepository {
         String property = properties.putIfAbsent(PROPERTY_MAX_DEPOSIT_AMOUNT,"1000000");
         return Double.parseDouble(property);
     }
+    @Override
+    public double getAtmLimit(){
+        String property = properties.putIfAbsent(PROPERTY_ATM_LIMIT,"100000");
+        return Double.parseDouble(property);
+    }
 
     private void loadFileData(String filePath, Consumer<String> lineProcessor) {
         try (BufferedReader reader = Files.newBufferedReader(Paths.get(filePath))) {
@@ -135,8 +141,6 @@ public class DataRepositoryImpl implements DataRepository {
             System.out.println("Ошибка во время записи в файл " + filePath);
         }
     }
-
-
 
     private void saveUserData() {
         List<String> lines = new ArrayList<>();
