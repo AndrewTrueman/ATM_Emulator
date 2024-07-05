@@ -22,7 +22,6 @@ public class DataRepositoryImpl implements DataRepository {
     private static final String PROPERTY_MAX_DEPOSIT_AMOUNT = "max-deposit-amount";
     private static final String PROPERTY_ATM_LIMIT = "atm-limit";
 
-
     private final Map<String, CardDto> cards = new HashMap<>();
     private final Map<String, LocalDateTime> blockedCards = new HashMap<>();
     private final Map<String, String> properties = new HashMap<>();

@@ -24,7 +24,7 @@ public class AtmMain {
     public void start() {
 
         do {
-            executeWithErrorHandling();
+            executeWithErrorHandling(); //Запуск метода Run с проверкой. Проверку вынесли в отдельный метод для читабильности
         } while ("Y".equalsIgnoreCase(getExit()));
     }
 
@@ -32,17 +32,18 @@ public class AtmMain {
         System.out.println("Добро пожаловать");
         SessionData session = new SessionData();
         session.setCardNumber(getCardNumber());
-        authorization.execute(session);
+        authorization.execute(session); // передаем текущую сессию в метод
         do {
             printMenu();
-            actions.get(getChoice()).execute(session);
+            actions.get(getChoice()).execute(session); // передаем номер операции выбранной пользователем и исполняем ее
         } while ("Y".equalsIgnoreCase(getExit()));
     }
 
-    private void printMenu() {
+    private void printMenu() { // Вывод меню операций
         int numOfOperation = 0;
         for (Action action : actions) {
-            System.out.println(numOfOperation++ + ". " + action.getName());
+            System.out.println(numOfOperation++ + ". " + action.getName()); // Выводим меню действий пользователя.
+            //Все действия хранятся в коллекции, выводим их по очереди и добавляем номер операции
         }
     }
 
@@ -73,7 +74,6 @@ public class AtmMain {
         try {
             run();
         } catch (Exception e) {
-            //e.printStackTrace();
             System.out.println("Ошибка! Попробуйте еще раз!");
         }
     }
