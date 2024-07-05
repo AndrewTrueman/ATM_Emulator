@@ -25,7 +25,7 @@ public class Withdraw implements Action {
         double newBalance = data.getCardDto().getBalance() - withdrawAmount;
         data.getCardDto().setBalance(newBalance);
         dataRepository.updateCard(data.getCardDto());
-        System.out.println("Cредства успешно сняты.");
+        System.out.println("Средства успешно сняты.");
 
     }
 
