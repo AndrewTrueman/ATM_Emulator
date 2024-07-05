@@ -50,9 +50,9 @@ The application properties are stored in the `Property.txt` file. The following 
 
 Example `Property.txt`:
 
-**max-attempts=3
-**max-deposit-amount=1000000
-**atm-limit=100000
+max-attempts=3
+max-deposit-amount=1000000
+atm-limit=100000
 
 
 ## Exception Handling
