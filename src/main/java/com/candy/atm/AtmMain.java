@@ -24,7 +24,7 @@ public class AtmMain {
     public void start() {
 
         do {
-            executeWithErrorHandling(); //Запуск метода Run с проверкой. Проверку вынесли в отдельный метод для читабильности
+            executeWithErrorHandling(); //Запуск метода Run с проверкой. Проверку вынесли в отдельный метод для читабельности
         } while ("Y".equalsIgnoreCase(getExit()));
     }
 
