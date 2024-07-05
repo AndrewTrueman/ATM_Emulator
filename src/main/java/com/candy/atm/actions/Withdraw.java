@@ -11,9 +11,9 @@ public class Withdraw implements Action {
     private final Scanner scanner;
 
 
-    public Withdraw(DataRepository dataRepository, double atmLimit) {
+    public Withdraw(DataRepository dataRepository) {
         this.dataRepository = dataRepository;
-        this.atmLimit = atmLimit;
+        this.atmLimit = dataRepository.getAtmLimit();
         this.scanner = new Scanner(System.in);
 
     }
@@ -37,7 +37,7 @@ public class Withdraw implements Action {
     private double getWithdrawAmount() {
         try {
             System.out.print("Введите сумму для снятия средств: ");
-            return Double.parseDouble(scanner.nextLine());
+            return scanner.nextDouble();
         } catch (IllegalArgumentException e) {
             throw e;
 

@@ -11,6 +11,7 @@ public class Deposit implements Action {
     private final Scanner scanner;
 
     public Deposit(DataRepository dataRepository) {
+
         this.dataRepository = dataRepository;
         this.maxDepositAmount = dataRepository.getMaxDepositAmount();
         this.scanner = new Scanner(System.in);

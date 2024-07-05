@@ -17,14 +17,14 @@ public class AtmMain {
     public AtmMain() {
         dataRepository = new DataRepositoryImpl();
         authorization = new Authorization(dataRepository);
-        actions = List.of(new Balance(), new Deposit(dataRepository), new Withdraw(dataRepository, dataRepository.getAtmLimit()));
+        actions = List.of(new Balance(), new Deposit(dataRepository), new Withdraw(dataRepository));
         scanner = new Scanner(System.in);
     }
 
     public void start() {
 
         do {
-          executeWithErrorHandling();
+            executeWithErrorHandling();
         } while ("Y".equalsIgnoreCase(getExit()));
     }
 
@@ -69,7 +69,7 @@ public class AtmMain {
         return scanner.nextLine();
     }
 
-    private void executeWithErrorHandling(){
+    private void executeWithErrorHandling() {
         try {
             run();
         } catch (Exception e) {

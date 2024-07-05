@@ -2,10 +2,16 @@ package com.candy.atm.data;
 
 import com.candy.atm.dto.CardDto;
 
-import java.io.*;
-import java.nio.file.*;
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.time.LocalDateTime;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.function.Consumer;
 
 public class DataRepositoryImpl implements DataRepository {
@@ -15,7 +21,6 @@ public class DataRepositoryImpl implements DataRepository {
     private static final String PROPERTY_MAX_ATTEMPTS = "max-attempts";
     private static final String PROPERTY_MAX_DEPOSIT_AMOUNT = "max-deposit-amount";
     private static final String PROPERTY_ATM_LIMIT = "atm-limit";
-
 
 
     private final Map<String, CardDto> cards = new HashMap<>();
@@ -31,7 +36,7 @@ public class DataRepositoryImpl implements DataRepository {
     @Override
     public CardDto getCardByNumber(String cardNumber) {
         CardDto card = cards.get(cardNumber);
-        if (card == null){
+        if (card == null) {
             throw new RuntimeException("Карта не найдена.");
         }
         return card;
@@ -78,12 +83,13 @@ public class DataRepositoryImpl implements DataRepository {
 
     @Override
     public double getMaxDepositAmount() {
-        String property = properties.putIfAbsent(PROPERTY_MAX_DEPOSIT_AMOUNT,"1000000");
+        String property = properties.putIfAbsent(PROPERTY_MAX_DEPOSIT_AMOUNT, "1000000");
         return Double.parseDouble(property);
     }
+
     @Override
-    public double getAtmLimit(){
-        String property = properties.putIfAbsent(PROPERTY_ATM_LIMIT,"100000");
+    public double getAtmLimit() {
+        String property = properties.putIfAbsent(PROPERTY_ATM_LIMIT, "100000");
         return Double.parseDouble(property);
     }
 
@@ -157,7 +163,6 @@ public class DataRepositoryImpl implements DataRepository {
         }
         saveFileData(BLOCKED_CARDS_FILE, lines);
     }
-
 
 
 }
