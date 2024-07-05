@@ -17,6 +17,7 @@ public interface DataRepository {
      int getMaxAttempts();
 
      double getMaxDepositAmount();
+
      double getAtmLimit();
 
 }
