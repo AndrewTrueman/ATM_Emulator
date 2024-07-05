@@ -49,7 +49,7 @@ public class Authorization implements Action {
     }
 
     private int getPin() {
-        System.out.print("ВВедите Пин-код: ");
+        System.out.print("Введите Пин-код: ");
         try {
             return scanner.nextInt();
         } catch (Exception e) {
