@@ -75,19 +75,19 @@ public class DataRepositoryImpl implements DataRepository {
 
     @Override
     public int getMaxAttempts() {
-        String property = properties.putIfAbsent(PROPERTY_MAX_ATTEMPTS, "3");// Устанавливаем значения по умолчанию в случае ошибки чтения файла
+        String property = properties.putIfAbsent(PROPERTY_MAX_ATTEMPTS, "3");
         return Integer.parseInt(property);
     }
 
     @Override
     public double getMaxDepositAmount() {
-        String property = properties.putIfAbsent(PROPERTY_MAX_DEPOSIT_AMOUNT, "1000000");// Устанавливаем значения по умолчанию в случае ошибки чтения файла
+        String property = properties.putIfAbsent(PROPERTY_MAX_DEPOSIT_AMOUNT, "1000000");
         return Double.parseDouble(property);
     }
 
     @Override
     public double getAtmLimit() {
-        String property = properties.putIfAbsent(PROPERTY_ATM_LIMIT, "100000");// Устанавливаем значения по умолчанию в случае ошибки чтения файла
+        String property = properties.putIfAbsent(PROPERTY_ATM_LIMIT, "100000");
         return Double.parseDouble(property);
     }
 

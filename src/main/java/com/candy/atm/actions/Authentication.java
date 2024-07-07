@@ -6,13 +6,13 @@ import com.candy.atm.dto.SessionData;
 
 import java.util.Scanner;
 
-public class Authorization implements Action {
+public class Authentication implements Action {
     private final DataRepository dataRepository;
     private final int maxAttempts;
     private final Scanner scanner;
 
 
-    public Authorization(DataRepository dataRepository) {
+    public Authentication(DataRepository dataRepository) {
         this.dataRepository = dataRepository;
         this.maxAttempts = dataRepository.getMaxAttempts();
         this.scanner = new Scanner(System.in);

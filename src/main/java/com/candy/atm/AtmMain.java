@@ -16,7 +16,7 @@ public class AtmMain {
 
     public AtmMain() {
         dataRepository = new DataRepositoryImpl();
-        authorization = new Authorization(dataRepository);
+        authorization = new Authentication(dataRepository);
         actions = List.of(new Balance(), new Deposit(dataRepository), new Withdraw(dataRepository));
         scanner = new Scanner(System.in);
     }
@@ -24,7 +24,7 @@ public class AtmMain {
     public void start() {
 
         do {
-            executeWithErrorHandling(); //Запуск метода Run с проверкой. Проверку вынесли в отдельный метод для читабельности
+            execute();
         } while ("Y".equalsIgnoreCase(getExit()));
     }
 
@@ -32,18 +32,18 @@ public class AtmMain {
         System.out.println("Добро пожаловать");
         SessionData session = new SessionData();
         session.setCardNumber(getCardNumber());
-        authorization.execute(session); // передаем текущую сессию в метод
+        authorization.execute(session);
         do {
             printMenu();
-            actions.get(getChoice()).execute(session); // передаем номер операции выбранной пользователем и исполняем ее
+            actions.get(getChoice()).execute(session);
         } while ("Y".equalsIgnoreCase(getExit()));
     }
 
-    private void printMenu() { // Вывод меню операций
+    private void printMenu() {
         int numOfOperation = 0;
         for (Action action : actions) {
-            System.out.println(numOfOperation++ + ". " + action.getName()); // Выводим меню действий пользователя.
-            //Все действия хранятся в коллекции, выводим их по очереди и добавляем номер операции
+            System.out.println(numOfOperation++ + ". " + action.getName());
+
         }
     }
 
@@ -70,7 +70,7 @@ public class AtmMain {
         return scanner.nextLine();
     }
 
-    private void executeWithErrorHandling() {
+    private void execute() {
         try {
             run();
         } catch (Exception e) {
