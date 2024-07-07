@@ -1,6 +1,7 @@
 package com.candy.atm;
 
 import com.candy.atm.actions.*;
+import com.candy.atm.data.DataRepository;
 import com.candy.atm.data.DataRepositoryImpl;
 import com.candy.atm.dto.SessionData;
 
@@ -9,7 +10,7 @@ import java.util.Scanner;
 
 public class AtmMain {
 
-    private final DataRepositoryImpl dataRepository;
+    private final DataRepository dataRepository;
     private final List<Action> actions;
     private final Action authorization;
     private final Scanner scanner;
